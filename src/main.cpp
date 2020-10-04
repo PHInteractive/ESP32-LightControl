@@ -11,7 +11,7 @@
 
   //Setup Variables
   //timers
-  int Room_1_Time_left_ms = 0;
+  int Room_1_Time_Left_ms = 0;
   int Room_2_Time_Left_ms = 0;
   int Room_3_Time_Left_ms = 0;
   int Room_4_Time_Left_ms = 0;
@@ -55,6 +55,9 @@ void setup() {
   Room1.attachClick(Room1Click);
   Room1.attachDoubleClick(Room1DoubleClick);
   Room1.attachDuringLongPress(Room1LongPress);
+  Room2.attachClick(Room1Click);
+  Room2.attachDoubleClick(Room1DoubleClick);
+  Room2.attachDuringLongPress(Room1LongPress);
 }
 
 void loop() {
@@ -65,43 +68,58 @@ void loop() {
 void RelayController(void * parameters){
   do{
     vTaskDelay(time_wait_loop_ms / portTICK_PERIOD_MS);
-    if(Room_1_Time_left_ms <= 0){
-    digitalWrite(2, 1);
-    Serial.println("off");
-  }else if(Room_1_Time_left_ms == 60000 or Room_1_Time_left_ms == 59500){
-    digitalWrite(2,1);
-    Serial.println("temp off");
-    Room_1_Time_left_ms = Room_1_Time_left_ms - time_wait_loop_ms;
-  }else{
-    digitalWrite(2, 0);
-    Room_1_Time_left_ms = Room_1_Time_left_ms - time_wait_loop_ms;
-    Serial.println(Room_1_Time_left_ms);
-    Serial.println("on");
-  }
+    if(Room_1_Time_Left_ms <= 0){
+      digitalWrite(2, 1);
+    }else if(Room_1_Time_Left_ms == 60000 or Room_1_Time_Left_ms == 59500){
+      digitalWrite(2,1);
+      Room_1_Time_Left_ms = Room_1_Time_Left_ms - time_wait_loop_ms;
+    }else{
+      digitalWrite(2, 0);
+      Room_1_Time_Left_ms = Room_1_Time_Left_ms - time_wait_loop_ms;
+    }
+    if(Room_2_Time_Left_ms <= 0){
+      digitalWrite(4, 1);
+    }else if(Room_2_Time_Left_ms == 60000 or Room_2_Time_Left_ms == 59500){
+      digitalWrite(4,1);
+      Room_2_Time_Left_ms = Room_2_Time_Left_ms - time_wait_loop_ms;
+    }else{
+      digitalWrite(4, 0);
+      Room_2_Time_Left_ms = Room_2_Time_Left_ms - time_wait_loop_ms;
+    }
   }while(true);
 }
 
 void Room1Click(){
-  if(Room_1_Time_left_ms <= 180000){
-    Room_1_Time_left_ms = 180000;
+  if(Room_1_Time_Left_ms <= 180000){
+    Room_1_Time_Left_ms = 180000;
   }
 }
 
 void Room1DoubleClick(){
-  if(Room_1_Time_left_ms <= 1800000){
-    Room_1_Time_left_ms = 1800000;
+  if(Room_1_Time_Left_ms <= 1800000){
+    Room_1_Time_Left_ms = 1800000;
   }
 }
 
 void Room1LongPress(){
-  Room_1_Time_left_ms = 0;
+  Room_1_Time_Left_ms = 0;
 }
 
-void Room2Click(){}
+void Room2Click(){
+  if(Room_2_Time_Left_ms <= 180000){
+    Room_2_Time_Left_ms = 180000;
+  }
+}
 
-void Room2DoubleClick(){}
+void Room2DoubleClick(){
+  if(Room_2_Time_Left_ms <= 1800000){
+    Room_2_Time_Left_ms = 1800000;
+  }
+}
 
-void Room2LongPress(){}
+void Room2LongPress(){
+  Room_2_Time_Left_ms = 0;
+}
 
 void Room3Click(){}
 
