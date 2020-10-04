@@ -58,9 +58,14 @@ void setup() {
   Room1.attachClick(Room1Click);
   Room1.attachDoubleClick(Room1DoubleClick);
   Room1.attachDuringLongPress(Room1LongPress);
+  Room1.attachLongPressStop(Room1LongPress);
+  Room1.attachLongPressStart(Room1LongPress);
+  
   Room2.attachClick(Room2Click);
   Room2.attachDoubleClick(Room2DoubleClick);
   Room2.attachDuringLongPress(Room2LongPress);
+  Room2.attachLongPressStop(Room2LongPress);
+  Room2.attachLongPressStart(Room2LongPress);
 }
 
 void loop() {
