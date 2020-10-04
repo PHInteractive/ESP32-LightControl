@@ -20,7 +20,10 @@
   void RelayController(void * parameters);
   void Room1Click();
   void Room1DoubleClick();
-  void Room1LongPress();
+  void Room1LongPress();  
+  void Room2Click();
+  void Room2DoubleClick();
+  void Room2LongPress();
   //global
   int time_wait_loop_ms = 500;
 
@@ -50,24 +53,27 @@ void setup() {
   pinMode(22, OUTPUT);
   pinMode(21, OUTPUT);
   //setup Threads
-  xTaskCreate(RelayController, "RelayController", 1024, NULL, 2, NULL);
+  xTaskCreate(RelayController, "RelayController", 2048, NULL, 2, NULL);
 
   Room1.attachClick(Room1Click);
   Room1.attachDoubleClick(Room1DoubleClick);
   Room1.attachDuringLongPress(Room1LongPress);
-  Room2.attachClick(Room1Click);
-  Room2.attachDoubleClick(Room1DoubleClick);
-  Room2.attachDuringLongPress(Room1LongPress);
+  Room2.attachClick(Room2Click);
+  Room2.attachDoubleClick(Room2DoubleClick);
+  Room2.attachDuringLongPress(Room2LongPress);
 }
 
 void loop() {
   Room1.tick();
-
+  Room2.tick();
+  vTaskDelay(250 / portTICK_PERIOD_MS);
 }
 
 void RelayController(void * parameters){
   do{
     vTaskDelay(time_wait_loop_ms / portTICK_PERIOD_MS);
+    Serial.println(Room_1_Time_Left_ms);
+    Serial.println(Room_2_Time_Left_ms);
     if(Room_1_Time_Left_ms <= 0){
       digitalWrite(2, 1);
     }else if(Room_1_Time_Left_ms == 60000 or Room_1_Time_Left_ms == 59500){
