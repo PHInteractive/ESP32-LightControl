@@ -71,7 +71,6 @@ void setup() {
 void loop() {
   Room1.tick();
   Room2.tick();
-  vTaskDelay(250 / portTICK_PERIOD_MS);
 }
 
 void RelayController(void * parameters){
