@@ -28,9 +28,6 @@
   int time_wait_loop_ms = 500;
 
 void setup() {
-  Serial.begin(115200);
-  Serial.println("Starting ...");
-  
   //Setup Outputs
   pinMode(2, OUTPUT);
   pinMode(4, OUTPUT);
