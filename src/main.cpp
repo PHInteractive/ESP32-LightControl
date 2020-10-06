@@ -53,7 +53,7 @@ void setup() {
   pinMode(22, OUTPUT);
   pinMode(21, OUTPUT);
   //setup Threads
-  //xTaskCreate(RelayController, "RelayController", 2048, NULL, 2, NULL);
+  xTaskCreate(RelayController, "RelayController", 2048, NULL, 2, NULL);
 
   Room1.attachClick(Room1Click);
   Room1.attachDoubleClick(Room1DoubleClick);
@@ -69,12 +69,14 @@ void setup() {
 }
 
 void loop() {
+  vTaskDelay(50 / portTICK_PERIOD_MS);
   Room1.tick();
   Room2.tick();
+}
 
-      vTaskDelay(time_wait_loop_ms / portTICK_PERIOD_MS);
-    Serial.println(Room_1_Time_Left_ms);
-    Serial.println(Room_2_Time_Left_ms);
+void RelayController(void * parameters){
+  do{
+    vTaskDelay(time_wait_loop_ms / portTICK_PERIOD_MS);
     if(Room_1_Time_Left_ms <= 0){
       digitalWrite(2, 1);
     }else if(Room_1_Time_Left_ms == 60000 or Room_1_Time_Left_ms == 59500){
@@ -93,11 +95,6 @@ void loop() {
       digitalWrite(4, 0);
       Room_2_Time_Left_ms = Room_2_Time_Left_ms - time_wait_loop_ms;
     }
-
-}
-
-void RelayController(void * parameters){
-  do{
   }while(true);
 }
 
