@@ -81,7 +81,6 @@ void Room2LongPress();
 int time_wait_loop_ms = 500;
 
 void setup() {
-  Serial.begin(112500);
   //Setup Outputs
   pinMode(2, OUTPUT);
   pinMode(4, OUTPUT);
@@ -123,9 +122,6 @@ void setup() {
   WiFi.persistent(false);
   WiFi.softAP(ssid, password, 1, 1);
   vTaskDelay(2000 / portTICK_PERIOD_MS);
-  IPAddress IP = WiFi.softAPIP();
-  Serial.print("AP IP address: ");
-  Serial.println(IP);
   Server.on("/", HTTP_GET, [](AsyncWebServerRequest* request){
     request->send_P(200, "text/html", index_html, processor);
   });
