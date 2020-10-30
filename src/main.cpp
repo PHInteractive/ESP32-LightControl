@@ -1,6 +1,12 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <OneButton.h>
+#include <WiFi.h>
+#include <WebServer.h>
+
+  //WiFi credentials
+  const char* ssid = "ESP32_LightControll";
+  const char* password = "supersecurePassword";
 
   //Setup Inputs
   OneButton Room1(32, true);
