@@ -17,7 +17,8 @@
   int Room_4_Time_Left_ms = 0;
   int Room_5_Time_Left_ms = 0;
   //functions
-  void RelayController(void * parameters);
+  void Relay1Controller(void * parameters);
+  void Relay2Controller(void * parameters);
   void Room1Click();
   void Room1DoubleClick();
   void Room1LongPress();  
@@ -50,7 +51,8 @@ void setup() {
   pinMode(22, OUTPUT);
   pinMode(21, OUTPUT);
   //setup Threads
-  xTaskCreate(RelayController, "RelayController", 2048, NULL, 2, NULL);
+  xTaskCreate(Relay1Controller, "Relay1Controller", 1024, NULL, NULL, NULL);
+  xTaskCreate(Relay2Controller, "Relay2Controller", 1024, NULL, NULL, NULL);
 
   Room1.attachClick(Room1Click);
   Room1.attachDoubleClick(Room1DoubleClick);
@@ -71,7 +73,7 @@ void loop() {
   Room2.tick();
 }
 
-void RelayController(void * parameters){
+void Relay1Controller(void * parameters){
   do{
     vTaskDelay(time_wait_loop_ms / portTICK_PERIOD_MS);
     if(Room_1_Time_Left_ms <= 0){
@@ -83,6 +85,12 @@ void RelayController(void * parameters){
       digitalWrite(2, 0);
       Room_1_Time_Left_ms = Room_1_Time_Left_ms - time_wait_loop_ms;
     }
+  }while(true);
+}
+
+void Relay2Controller(void * parameters){
+  do{
+    vTaskDelay(time_wait_loop_ms / portTICK_PERIOD_MS);
     if(Room_2_Time_Left_ms <= 0){
       digitalWrite(4, 1);
     }else if(Room_2_Time_Left_ms == 60000 or Room_2_Time_Left_ms == 59500){
@@ -96,14 +104,14 @@ void RelayController(void * parameters){
 }
 
 void Room1Click(){
-  if(Room_1_Time_Left_ms <= 180000){
-    Room_1_Time_Left_ms = 180000;
+  if(Room_1_Time_Left_ms <= 300000){
+    Room_1_Time_Left_ms = 300000;
   }
 }
 
 void Room1DoubleClick(){
-  if(Room_1_Time_Left_ms <= 1800000){
-    Room_1_Time_Left_ms = 1800000;
+  if(Room_1_Time_Left_ms <= 1200000){
+    Room_1_Time_Left_ms = 1200000;
   }
 }
 
@@ -118,8 +126,8 @@ void Room2Click(){
 }
 
 void Room2DoubleClick(){
-  if(Room_2_Time_Left_ms <= 1800000){
-    Room_2_Time_Left_ms = 1800000;
+  if(Room_2_Time_Left_ms <= 900000){
+    Room_2_Time_Left_ms = 900000;
   }
 }
 
