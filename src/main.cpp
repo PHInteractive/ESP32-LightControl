@@ -19,6 +19,7 @@ String processor(const String& var);
 String outputState(int room);
 const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML><html>
+<meta http-equiv="refresh" content="10;url=/">
 <head>
   <title>LightControl</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -214,6 +215,7 @@ void Room1DoubleClick(){
 
 void Room1LongPress(){
   Room_1_Time_Left_ms = 0;
+  Room_1_AlwaysOn = false;
 }
 
 void Room2Click(){
@@ -230,6 +232,7 @@ void Room2DoubleClick(){
 
 void Room2LongPress(){
   Room_2_Time_Left_ms = 0;
+  Room_2_AlwaysOn = false;
 }
 
 void Room3Click(){}
