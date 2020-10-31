@@ -81,6 +81,9 @@ void Room1LongPress();
 void Room2Click();
 void Room2DoubleClick();
 void Room2LongPress();
+void Room3Click();
+void Room3DoubleClick();
+void Room3LongPress();
 //global
 int time_wait_loop_ms = 500;
 
@@ -123,6 +126,12 @@ void setup() {
   Room2.attachLongPressStop(Room2LongPress);
   Room2.attachLongPressStart(Room2LongPress);
 
+  Room3.attachClick(Room3Click);
+  Room3.attachDoubleClick(Room3DoubleClick);
+  Room3.attachDuringLongPress(Room3LongPress);
+  Room3.attachLongPressStop(Room3LongPress);
+  Room3.attachLongPressStart(Room3LongPress);
+
   //initialize WiFi and WebServer
   WiFi.persistent(false);
   WiFi.softAP(ssid, password, 1, 1);
@@ -164,6 +173,7 @@ void loop() {
   vTaskDelay(50 / portTICK_PERIOD_MS);
   Room1.tick();
   Room2.tick();
+  Room3.tick();
 }
 
 void Relay1Controller(void * parameters){
