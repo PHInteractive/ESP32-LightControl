@@ -161,6 +161,13 @@ void setup() {
           }else if(inputMessage2.toInt() == 0){
             Room_2_AlwaysOn = false;
           }
+
+        case 3 :
+          if(inputMessage2.toInt() == 1){
+            Room_2_AlwaysOn = true;
+          }else if(inputMessage2.toInt() == 0){
+            Room_2_AlwaysOn = false;
+          }
           break;
       }
     }
@@ -298,6 +305,7 @@ String processor(const String& var){
     String buttons = "";
     buttons += "<h4>Output - Room 1</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"1\" " + outputState(1) + "><span class=\"slider\"></span></label>";
     buttons += "<h4>Output - Room 2</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"2\" " + outputState(2) + "><span class=\"slider\"></span></label>";
+    buttons += "<h4>Output - Room 3</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"3\" " + outputState(3) + "><span class=\"slider\"></span></label>";
     return buttons;
   }
   return String();
@@ -314,6 +322,13 @@ String outputState(int room){
 
     case 2 :
       if(Room_2_AlwaysOn == true){
+        return "checked";
+      }else{
+        return "";
+      }
+      
+    case 3 :
+      if(Room_3_AlwaysOn == true){
         return "checked";
       }else{
         return "";
