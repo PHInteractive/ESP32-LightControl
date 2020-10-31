@@ -166,7 +166,7 @@ void Relay1Controller(void * parameters){
     vTaskDelay(time_wait_loop_ms / portTICK_PERIOD_MS);
     if(Room_1_AlwaysOn == true){
       Room_1_Time_Left_ms = 60000;
-      digitalWrite(4, 0);
+      digitalWrite(2, 0);
     }else if(Room_1_Time_Left_ms <= 0){
       digitalWrite(2, 1);
     }else if(Room_1_Time_Left_ms == 60000 or Room_1_Time_Left_ms == 59500){
