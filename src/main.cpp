@@ -63,6 +63,9 @@ OneButton Room5(3, true);
 //timers
 bool Room_1_AlwaysOn = false;
 bool Room_2_AlwaysOn = false;
+bool Room_3_AlwaysOn = false;
+bool Room_4_AlwaysOn = false;
+bool Room_5_AlwaysOn = false;
 int Room_1_Time_Left_ms = 0;
 int Room_2_Time_Left_ms = 0;
 int Room_3_Time_Left_ms = 0;
@@ -71,6 +74,7 @@ int Room_5_Time_Left_ms = 0;
 //functions
 void Relay1Controller(void * parameters);
 void Relay2Controller(void * parameters);
+void Relay3Controller(void * parameters);
 void Room1Click();
 void Room1DoubleClick();
 void Room1LongPress();  
@@ -105,6 +109,7 @@ void setup() {
   //setup Threads
   xTaskCreate(Relay1Controller, "Relay1Controller", 1024, NULL, 2, NULL);
   xTaskCreate(Relay2Controller, "Relay2Controller", 1024, NULL, 2, NULL);
+  xTaskCreate(Relay3Controller, "Relay3Controller", 1024, NULL, 2, NULL);
 
   Room1.attachClick(Room1Click);
   Room1.attachDoubleClick(Room1DoubleClick);
@@ -197,9 +202,27 @@ void Relay2Controller(void * parameters){
   }while(true);
 }
 
+void Relay3Controller(void * parameters){
+  do{
+    vTaskDelay(time_wait_loop_ms / portTICK_PERIOD_MS);
+    if(Room_3_AlwaysOn == true){
+      Room_3_Time_Left_ms = 60000;
+      digitalWrite(12, 0);
+    }else if(Room_3_Time_Left_ms <= 0){
+      digitalWrite(12, 1);
+    }else if(Room_3_Time_Left_ms == 60000 or Room_3_Time_Left_ms == 59500){
+      digitalWrite(12,1);
+      Room_3_Time_Left_ms = Room_3_Time_Left_ms - time_wait_loop_ms;
+    }else{
+      digitalWrite(12, 0);
+      Room_3_Time_Left_ms = Room_3_Time_Left_ms - time_wait_loop_ms;
+    }
+  }while(true);
+}
+
 void Room1Click(){
-  if(Room_1_Time_Left_ms <= 300000){
-    Room_1_Time_Left_ms = 300000;
+  if(Room_1_Time_Left_ms <= 420000){
+    Room_1_Time_Left_ms = 420000;
   }
 }
 
@@ -231,11 +254,22 @@ void Room2LongPress(){
   Room_2_AlwaysOn = false;
 }
 
-void Room3Click(){}
+void Room3Click(){
+  if(Room_3_Time_Left_ms <= 180000){
+    Room_3_Time_Left_ms = 180000;
+  }
+}
 
-void Room3DoubleClick(){}
+void Room3DoubleClick(){
+  if(Room_3_Time_Left_ms <= 900000){
+    Room_3_Time_Left_ms = 900000;
+  }
+}
 
-void Room3LongPress(){}
+void Room3LongPress(){
+  Room_3_Time_Left_ms = 0;
+  Room_3_AlwaysOn = false;
+}
 
 void Room4Click(){}
 
