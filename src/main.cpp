@@ -277,14 +277,14 @@ void Relay4Controller(void * parameters){
     vTaskDelay(time_wait_loop_ms / portTICK_PERIOD_MS);
     if(Room_4_AlwaysOn == true){
       Room_4_Time_Left_ms = 60000;
-      digitalWrite(12, 0);
+      digitalWrite(13, 0);
     }else if(Room_4_Time_Left_ms <= 0){
-      digitalWrite(12, 1);
+      digitalWrite(13, 1);
     }else if(Room_4_Time_Left_ms == 60000 or Room_4_Time_Left_ms == 59500){
-      digitalWrite(12,1);
+      digitalWrite(13,1);
       Room_4_Time_Left_ms = Room_4_Time_Left_ms - time_wait_loop_ms;
     }else{
-      digitalWrite(12, 0);
+      digitalWrite(13, 0);
       Room_4_Time_Left_ms = Room_4_Time_Left_ms - time_wait_loop_ms;
     }
   }while(true);
@@ -295,14 +295,14 @@ void Relay5Controller(void * parameters){
     vTaskDelay(time_wait_loop_ms / portTICK_PERIOD_MS);
     if(Room_5_AlwaysOn == true){
       Room_5_Time_Left_ms = 60000;
-      digitalWrite(12, 0);
+      digitalWrite(33, 0);
     }else if(Room_5_Time_Left_ms <= 0){
-      digitalWrite(12, 1);
+      digitalWrite(33, 1);
     }else if(Room_5_Time_Left_ms == 60000 or Room_5_Time_Left_ms == 59500){
-      digitalWrite(12,1);
+      digitalWrite(33,1);
       Room_5_Time_Left_ms = Room_5_Time_Left_ms - time_wait_loop_ms;
     }else{
-      digitalWrite(12, 0);
+      digitalWrite(33, 0);
       Room_5_Time_Left_ms = Room_5_Time_Left_ms - time_wait_loop_ms;
     }
   }while(true);
