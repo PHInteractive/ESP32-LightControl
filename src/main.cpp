@@ -120,8 +120,8 @@ void setup() {
   xTaskCreate(Relay1Controller, "Relay1Controller", 1024, NULL, 2, NULL);
   xTaskCreate(Relay2Controller, "Relay2Controller", 1024, NULL, 2, NULL);
   xTaskCreate(Relay3Controller, "Relay3Controller", 1024, NULL, 2, NULL);
-  xTaskCreate(Relay3Controller, "Relay4Controller", 1024, NULL, 2, NULL);
-  xTaskCreate(Relay3Controller, "Relay5Controller", 1024, NULL, 2, NULL);
+  xTaskCreate(Relay4Controller, "Relay4Controller", 1024, NULL, 2, NULL);
+  xTaskCreate(Relay5Controller, "Relay5Controller", 1024, NULL, 2, NULL);
 
   Room1.attachClick(Room1Click);
   Room1.attachDoubleClick(Room1DoubleClick);
