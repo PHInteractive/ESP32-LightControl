@@ -19,7 +19,6 @@ String processor(const String& var);
 String outputState(int room);
 const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML><html>
-<meta http-equiv="refresh" content="10;url=/">
 <head>
   <title>LightControl</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -37,7 +36,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     input:checked+.slider:before {-webkit-transform: translateX(52px); -ms-transform: translateX(52px); transform: translateX(52px)}
   </style>
 </head>
-<body>
+<body onload = "JavaScript:AutoRefresh(5000);">
   <h2>ESP32 Light Control</h2>
   %BUTTONPLACEHOLDER%
 <script>function toggleCheckbox(element) {
@@ -45,6 +44,9 @@ const char index_html[] PROGMEM = R"rawliteral(
   if(element.checked){ xhr.open("GET", "/update?output="+element.id+"&state=1", true); }
   else { xhr.open("GET", "/update?output="+element.id+"&state=0", true); }
   xhr.send();
+}
+function AutoRefresh( t ) {
+  setTimeout("location.reload(true);", t);
 }
 </script>
 </body>
