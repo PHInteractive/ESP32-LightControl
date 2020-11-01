@@ -114,9 +114,6 @@ void setup() {
   digitalWrite(25, 1);
   digitalWrite(26, 1);
   digitalWrite(27, 1);
-  //Setup MosFet Outputs
-  pinMode(22, OUTPUT);
-  pinMode(21, OUTPUT);
   //setup Threads
   xTaskCreate(Relay1Controller, "Relay1Controller", 1024, NULL, 2, NULL);
   xTaskCreate(Relay2Controller, "Relay2Controller", 1024, NULL, 2, NULL);
