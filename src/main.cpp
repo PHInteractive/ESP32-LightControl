@@ -84,6 +84,12 @@ void Room2LongPress();
 void Room3Click();
 void Room3DoubleClick();
 void Room3LongPress();
+void Room4Click();
+void Room4DoubleClick();
+void Room4LongPress();
+void Room5Click();
+void Room5DoubleClick();
+void Room5LongPress();
 //global
 int time_wait_loop_ms = 500;
 
@@ -132,6 +138,18 @@ void setup() {
   Room3.attachLongPressStop(Room3LongPress);
   Room3.attachLongPressStart(Room3LongPress);
 
+  Room4.attachClick(Room3Click);
+  Room4.attachDoubleClick(Room3DoubleClick);
+  Room4.attachDuringLongPress(Room3LongPress);
+  Room4.attachLongPressStop(Room3LongPress);
+  Room4.attachLongPressStart(Room3LongPress);
+
+  Room5.attachClick(Room3Click);
+  Room5.attachDoubleClick(Room3DoubleClick);
+  Room5.attachDuringLongPress(Room3LongPress);
+  Room5.attachLongPressStop(Room3LongPress);
+  Room5.attachLongPressStart(Room3LongPress);
+  
   //initialize WiFi and WebServer
   WiFi.persistent(false);
   WiFi.softAP(ssid, password, 1, 1);
@@ -168,6 +186,20 @@ void setup() {
           }else if(inputMessage2.toInt() == 0){
             Room_2_AlwaysOn = false;
           }
+
+        case 4 :
+          if(inputMessage2.toInt() == 1){
+            Room_4_AlwaysOn = true;
+          }else if(inputMessage2.toInt() == 0){
+            Room_4_AlwaysOn = false;
+          }
+
+        case 5 :
+          if(inputMessage2.toInt() == 1){
+            Room_5_AlwaysOn = true;
+          }else if(inputMessage2.toInt() == 0){
+            Room_5_AlwaysOn = false;
+          }
           break;
       }
     }
@@ -181,6 +213,8 @@ void loop() {
   Room1.tick();
   Room2.tick();
   Room3.tick();
+  Room4.tick();
+  Room5.tick();
 }
 
 void Relay1Controller(void * parameters){
@@ -237,6 +271,42 @@ void Relay3Controller(void * parameters){
   }while(true);
 }
 
+void Relay4Controller(void * parameters){
+  do{
+    vTaskDelay(time_wait_loop_ms / portTICK_PERIOD_MS);
+    if(Room_4_AlwaysOn == true){
+      Room_4_Time_Left_ms = 60000;
+      digitalWrite(12, 0);
+    }else if(Room_4_Time_Left_ms <= 0){
+      digitalWrite(12, 1);
+    }else if(Room_4_Time_Left_ms == 60000 or Room_4_Time_Left_ms == 59500){
+      digitalWrite(12,1);
+      Room_4_Time_Left_ms = Room_4_Time_Left_ms - time_wait_loop_ms;
+    }else{
+      digitalWrite(12, 0);
+      Room_4_Time_Left_ms = Room_4_Time_Left_ms - time_wait_loop_ms;
+    }
+  }while(true);
+}
+
+void Relay5Controller(void * parameters){
+  do{
+    vTaskDelay(time_wait_loop_ms / portTICK_PERIOD_MS);
+    if(Room_5_AlwaysOn == true){
+      Room_5_Time_Left_ms = 60000;
+      digitalWrite(12, 0);
+    }else if(Room_5_Time_Left_ms <= 0){
+      digitalWrite(12, 1);
+    }else if(Room_5_Time_Left_ms == 60000 or Room_5_Time_Left_ms == 59500){
+      digitalWrite(12,1);
+      Room_5_Time_Left_ms = Room_5_Time_Left_ms - time_wait_loop_ms;
+    }else{
+      digitalWrite(12, 0);
+      Room_5_Time_Left_ms = Room_5_Time_Left_ms - time_wait_loop_ms;
+    }
+  }while(true);
+}
+
 void Room1Click(){
   if(Room_1_Time_Left_ms <= 420000){
     Room_1_Time_Left_ms = 420000;
@@ -288,17 +358,39 @@ void Room3LongPress(){
   Room_3_AlwaysOn = false;
 }
 
-void Room4Click(){}
+void Room4Click(){
+  if(Room_4_Time_Left_ms <= 180000){
+    Room_4_Time_Left_ms = 180000;
+  }
+}
 
-void Room4DoubleClick(){}
+void Room4DoubleClick(){
+  if(Room_4_Time_Left_ms <= 900000){
+    Room_4_Time_Left_ms = 900000;
+  }
+}
 
-void Room4LongPress(){}
+void Room4LongPress(){
+  Room_4_Time_Left_ms = 0;
+  Room_4_AlwaysOn = false;
+}
 
-void Room5Click(){}
+void Room5Click(){
+  if(Room_5_Time_Left_ms <= 180000){
+    Room_5_Time_Left_ms = 180000;
+  }
+}
 
-void Room5DoubleClick(){}
+void Room5DoubleClick(){
+  if(Room_5_Time_Left_ms <= 900000){
+    Room_5_Time_Left_ms = 900000;
+  }
+}
 
-void Room5LongPress(){}
+void Room5LongPress(){
+  Room_5_Time_Left_ms = 0;
+  Room_5_AlwaysOn = false;
+}
 
 String processor(const String& var){
   if(var == "BUTTONPLACEHOLDER"){
@@ -306,6 +398,8 @@ String processor(const String& var){
     buttons += "<h4>Output - Room 1</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"1\" " + outputState(1) + "><span class=\"slider\"></span></label>";
     buttons += "<h4>Output - Room 2</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"2\" " + outputState(2) + "><span class=\"slider\"></span></label>";
     buttons += "<h4>Output - Room 3</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"3\" " + outputState(3) + "><span class=\"slider\"></span></label>";
+    buttons += "<h4>Output - Room 4</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"3\" " + outputState(4) + "><span class=\"slider\"></span></label>";
+    buttons += "<h4>Output - Room 5</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"3\" " + outputState(5) + "><span class=\"slider\"></span></label>";
     return buttons;
   }
   return String();
@@ -329,6 +423,20 @@ String outputState(int room){
       
     case 3 :
       if(Room_3_AlwaysOn == true){
+        return "checked";
+      }else{
+        return "";
+      }
+
+    case 4 :
+      if(Room_4_AlwaysOn == true){
+        return "checked";
+      }else{
+        return "";
+      }      
+
+    case 5 :
+      if(Room_5_AlwaysOn == true){
         return "checked";
       }else{
         return "";
