@@ -182,20 +182,22 @@ void setup() {
           }else if(inputMessage2.toInt() == 0){
             Room_2_AlwaysOn = false;
           }
+          break;
 
         case 3 :
           if(inputMessage2.toInt() == 1){
-            Room_2_AlwaysOn = true;
+            Room_3_AlwaysOn = true;
           }else if(inputMessage2.toInt() == 0){
-            Room_2_AlwaysOn = false;
+            Room_3_AlwaysOn = false;
           }
+          break;
 
         case 4 :
           if(inputMessage2.toInt() == 1){
             Room_4_AlwaysOn = true;
           }else if(inputMessage2.toInt() == 0){
             Room_4_AlwaysOn = false;
-          }
+          }break;
 
         case 5 :
           if(inputMessage2.toInt() == 1){
@@ -401,8 +403,8 @@ String processor(const String& var){
     buttons += "<h4>Output - Room 1</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"1\" " + outputState(1) + "><span class=\"slider\"></span></label>";
     buttons += "<h4>Output - Room 2</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"2\" " + outputState(2) + "><span class=\"slider\"></span></label>";
     buttons += "<h4>Output - Room 3</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"3\" " + outputState(3) + "><span class=\"slider\"></span></label>";
-    buttons += "<h4>Output - Room 4</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"3\" " + outputState(4) + "><span class=\"slider\"></span></label>";
-    buttons += "<h4>Output - Room 5</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"3\" " + outputState(5) + "><span class=\"slider\"></span></label>";
+    buttons += "<h4>Output - Room 4</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"4\" " + outputState(4) + "><span class=\"slider\"></span></label>";
+    buttons += "<h4>Output - Room 5</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"5\" " + outputState(5) + "><span class=\"slider\"></span></label>";
     return buttons;
   }
   return String();
@@ -416,6 +418,7 @@ String outputState(int room){
       }else{
         return "";
       }
+      break;
 
     case 2 :
       if(Room_2_AlwaysOn == true){
@@ -423,13 +426,14 @@ String outputState(int room){
       }else{
         return "";
       }
+      break;
       
     case 3 :
       if(Room_3_AlwaysOn == true){
         return "checked";
       }else{
         return "";
-      }
+      }break;
 
     case 4 :
       if(Room_4_AlwaysOn == true){
@@ -437,6 +441,7 @@ String outputState(int room){
       }else{
         return "";
       }      
+      break;
 
     case 5 :
       if(Room_5_AlwaysOn == true){
@@ -444,5 +449,6 @@ String outputState(int room){
       }else{
         return "";
       }
+      break;
   }return "";
 }
