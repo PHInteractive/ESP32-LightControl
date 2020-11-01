@@ -75,6 +75,8 @@ int Room_5_Time_Left_ms = 0;
 void Relay1Controller(void * parameters);
 void Relay2Controller(void * parameters);
 void Relay3Controller(void * parameters);
+void Relay4Controller(void * parameters);
+void Relay5Controller(void * parameters);
 void Room1Click();
 void Room1DoubleClick();
 void Room1LongPress();  
@@ -119,6 +121,8 @@ void setup() {
   xTaskCreate(Relay1Controller, "Relay1Controller", 1024, NULL, 2, NULL);
   xTaskCreate(Relay2Controller, "Relay2Controller", 1024, NULL, 2, NULL);
   xTaskCreate(Relay3Controller, "Relay3Controller", 1024, NULL, 2, NULL);
+  xTaskCreate(Relay3Controller, "Relay4Controller", 1024, NULL, 2, NULL);
+  xTaskCreate(Relay3Controller, "Relay5Controller", 1024, NULL, 2, NULL);
 
   Room1.attachClick(Room1Click);
   Room1.attachDoubleClick(Room1DoubleClick);
@@ -138,17 +142,17 @@ void setup() {
   Room3.attachLongPressStop(Room3LongPress);
   Room3.attachLongPressStart(Room3LongPress);
 
-  Room4.attachClick(Room3Click);
-  Room4.attachDoubleClick(Room3DoubleClick);
-  Room4.attachDuringLongPress(Room3LongPress);
-  Room4.attachLongPressStop(Room3LongPress);
-  Room4.attachLongPressStart(Room3LongPress);
+  Room4.attachClick(Room4Click);
+  Room4.attachDoubleClick(Room4DoubleClick);
+  Room4.attachDuringLongPress(Room4LongPress);
+  Room4.attachLongPressStop(Room4LongPress);
+  Room4.attachLongPressStart(Room4LongPress);
 
-  Room5.attachClick(Room3Click);
-  Room5.attachDoubleClick(Room3DoubleClick);
-  Room5.attachDuringLongPress(Room3LongPress);
-  Room5.attachLongPressStop(Room3LongPress);
-  Room5.attachLongPressStart(Room3LongPress);
+  Room5.attachClick(Room5Click);
+  Room5.attachDoubleClick(Room5DoubleClick);
+  Room5.attachDuringLongPress(Room5LongPress);
+  Room5.attachLongPressStop(Room5LongPress);
+  Room5.attachLongPressStart(Room5LongPress);
   
   //initialize WiFi and WebServer
   WiFi.persistent(false);
