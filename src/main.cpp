@@ -10,6 +10,10 @@
 //WiFi credentials
 const char* ssid = "ESP32_LightControl";
 const char* password = "supersecurePassword";
+IPAddress staticIP(192, 168, 1, 71);
+IPAddress gateway(192, 168, 1, 1);
+IPAddress subnet(255, 255, 255, 0);
+IPAddress dns(192, 168, 1, 1);
 
 //WebServer variables
 AsyncWebServer Server(80);
@@ -154,8 +158,17 @@ void setup() {
   Room5.attachLongPressStart(Room5LongPress);
   
   //initialize WiFi and WebServer
-  WiFi.persistent(false);
-  WiFi.softAP(ssid, password, 1, 1);
+  if (WiFi.config(staticIP, gateway, subnet, dns, dns) == false) {
+  }
+  WiFi.begin(ssid, password);
+  int counter = 0;
+  while(WiFi.status() != WL_CONNECTED){
+    vTaskDelay(50 / portTICK_PERIOD_MS);
+    if(counter >= 100){
+      ESP.restart();
+    }
+    counter++;
+  }
   vTaskDelay(2000 / portTICK_PERIOD_MS);
   Server.on("/", HTTP_GET, [](AsyncWebServerRequest* request){
     request->send_P(200, "text/html", index_html, processor);
