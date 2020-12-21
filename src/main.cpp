@@ -433,10 +433,13 @@ String outputState(int room){
 }
 
 void WiFi_connection_handler(void * parameters){
-  if(WiFi.status() != WL_CONNECTED){
-    WiFi.disconnect();
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
-    WiFi.begin();
-    vTaskDelay(5000 / portTICK_PERIOD_MS);
-  }
+  do{
+    vTaskDelay(10000 / portTICK_PERIOD_MS);
+    if(WiFi.status() != WL_CONNECTED){
+      WiFi.disconnect();
+      vTaskDelay(1000 / portTICK_PERIOD_MS);
+      WiFi.begin();
+      vTaskDelay(5000 / portTICK_PERIOD_MS);
+    }
+  }while(true);
 }
