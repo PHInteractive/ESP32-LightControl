@@ -155,14 +155,7 @@ void setup() {
   if (WiFi.config(staticIP, gateway, subnet, dns, dns) == false) {
   }
   WiFi.begin(ssid, password);
-  int counter = 0;
-  while(WiFi.status() != WL_CONNECTED){
-    vTaskDelay(50 / portTICK_PERIOD_MS);
-    if(counter >= 100){
-      ESP.restart();
-    }
-    counter++;
-  }
+
   Server.on("/", HTTP_GET, [](AsyncWebServerRequest* request){
     request->send_P(200, "text/html", index_html, processor);
   });
