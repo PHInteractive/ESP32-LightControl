@@ -79,10 +79,7 @@ int Room_4_Time_Left_ms = 0;
 int Room_5_Time_Left_ms = 0;
 //functions
 void Relay1Controller(void * parameters);
-void Relay2Controller(void * parameters);
-void Relay3Controller(void * parameters);
-void Relay4Controller(void * parameters);
-void Relay5Controller(void * parameters);
+void WiFi_connection_handler(void * parameters);
 void Room1Click();
 void Room1DoubleClick();
 void Room1LongPress();  
@@ -121,11 +118,8 @@ void setup() {
   digitalWrite(26, 1);
   digitalWrite(27, 1);
   //setup Threads
-  xTaskCreate(Relay1Controller, "Relay1Controller", 1024, NULL, 2, NULL);
-  //xTaskCreate(Relay2Controller, "Relay2Controller", 1024, NULL, 2, NULL);
-  //xTaskCreate(Relay3Controller, "Relay3Controller", 1024, NULL, 2, NULL);
-  //xTaskCreate(Relay4Controller, "Relay4Controller", 1024, NULL, 2, NULL);
-  //xTaskCreate(Relay5Controller, "Relay5Controller", 1024, NULL, 2, NULL);
+  xTaskCreate(Relay1Controller, "Relay1Controller", 4048, NULL, 2, NULL);
+  xTaskCreate(WiFi_connection_handler, "WiFi_connection_handler", 1024, NULL, 2, NULL);
 
   Room1.attachClick(Room1Click);
   Room1.attachDoubleClick(Room1DoubleClick);
@@ -276,7 +270,6 @@ void Relay1Controller(void * parameters){
       Room_3_Time_Left_ms = Room_3_Time_Left_ms - time_wait_loop_ms;
     }
 
-    vTaskDelay(time_wait_loop_ms / portTICK_PERIOD_MS);
     if(Room_4_AlwaysOn == true){
       Room_4_Time_Left_ms = 60000;
       digitalWrite(13, 0);
@@ -290,7 +283,6 @@ void Relay1Controller(void * parameters){
       Room_4_Time_Left_ms = Room_4_Time_Left_ms - time_wait_loop_ms;
     }
 
-    vTaskDelay(time_wait_loop_ms / portTICK_PERIOD_MS);
     if(Room_5_AlwaysOn == true){
       Room_5_Time_Left_ms = 60000;
       digitalWrite(33, 0);
@@ -445,4 +437,13 @@ String outputState(int room){
       }
       break;
   }return "";
+}
+
+void WiFi_connection_handler(void * parameters){
+  if(WiFi.status() != WL_CONNECTED){
+    WiFi.disconnect();
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    WiFi.begin();
+    vTaskDelay(5000 / portTICK_PERIOD_MS);
+  }
 }
