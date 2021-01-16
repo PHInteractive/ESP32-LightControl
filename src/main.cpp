@@ -64,6 +64,7 @@ OneButton Room2(23, true);
 OneButton Room3(15, true);
 OneButton Room4(1, true);
 OneButton Room5(3, true);
+OneButton Room6(21, true);
 
 //Setup Variables
 //timers
@@ -71,12 +72,13 @@ bool Room_1_AlwaysOn = false;
 bool Room_2_AlwaysOn = false;
 bool Room_3_AlwaysOn = false;
 bool Room_4_AlwaysOn = false;
-bool Room_5_AlwaysOn = false;
+bool Room_5_On = false;
+bool Room_6_On = false;
 int Room_1_Time_Left_ms = 0;
 int Room_2_Time_Left_ms = 0;
 int Room_3_Time_Left_ms = 0;
 int Room_4_Time_Left_ms = 0;
-int Room_5_Time_Left_ms = 0;
+
 //functions
 void Relay1Controller(void * parameters);
 void WiFi_connection_handler(void * parameters);
@@ -95,6 +97,9 @@ void Room4LongPress();
 void Room5Click();
 void Room5DoubleClick();
 void Room5LongPress();
+void Room6Click();
+void Room6DoubleClick();
+void Room6LongPress();
 //global
 int time_wait_loop_ms = 500;
 
@@ -151,6 +156,12 @@ void setup() {
   Room5.attachLongPressStop(Room5LongPress);
   Room5.attachLongPressStart(Room5LongPress);
   
+  Room6.attachClick(Room6Click);
+  Room6.attachDoubleClick(Room6DoubleClick);
+  Room6.attachDuringLongPress(Room6LongPress);
+  Room6.attachLongPressStop(Room6LongPress);
+  Room6.attachLongPressStart(Room6LongPress);
+  
   //initialize WiFi and WebServer
   if (WiFi.config(staticIP, gateway, subnet, dns, dns) == false) {
   }
@@ -200,9 +211,15 @@ void setup() {
 
         case 5 :
           if(inputMessage2.toInt() == 1){
-            Room_5_AlwaysOn = true;
+            Room_5_On = true;
           }else if(inputMessage2.toInt() == 0){
-            Room_5_AlwaysOn = false;
+            Room_5_On = false;
+          }
+        case 6 :
+          if(inputMessage2.toInt() == 1){
+            Room_6_On = true;
+          }else if(inputMessage2.toInt() == 0){
+            Room_6_On = false;
           }
           break;
       }
@@ -219,6 +236,7 @@ void loop() {
   Room3.tick();
   Room4.tick();
   Room5.tick();
+  Room6.tick();
 }
 
 void Relay1Controller(void * parameters){
@@ -276,17 +294,18 @@ void Relay1Controller(void * parameters){
       Room_4_Time_Left_ms = Room_4_Time_Left_ms - time_wait_loop_ms;
     }
 
-    if(Room_5_AlwaysOn == true){
-      Room_5_Time_Left_ms = 60000;
-      digitalWrite(33, 0);
-    }else if(Room_5_Time_Left_ms <= 0){
+    if(Room_5_On == false){
       digitalWrite(33, 1);
-    }else if(Room_5_Time_Left_ms == 60000 or Room_5_Time_Left_ms == 59500){
-      digitalWrite(33,1);
-      Room_5_Time_Left_ms = Room_5_Time_Left_ms - time_wait_loop_ms;
-    }else{
+      Room_6_On = false;
+      //digitalWrite(25, 1); //also turn off Room6 when Room5 is off
+    }else if(Room_5_On == true){
       digitalWrite(33, 0);
-      Room_5_Time_Left_ms = Room_5_Time_Left_ms - time_wait_loop_ms;
+    }
+
+    if(Room_6_On == true and Room_5_On == true){
+      digitalWrite(25, 0);
+    }else{
+      digitalWrite(25, 1);
     }
   }while(true);
 }
@@ -360,20 +379,31 @@ void Room4LongPress(){
 }
 
 void Room5Click(){
-  if(Room_5_Time_Left_ms <= 180000){
-    Room_5_Time_Left_ms = 180000;
+  if(Room_5_On == true){
+    Room_5_On = false;
+  }else{
+    Room_5_On = true;
   }
 }
 
 void Room5DoubleClick(){
-  if(Room_5_Time_Left_ms <= 900000){
-    Room_5_Time_Left_ms = 900000;
-  }
 }
 
 void Room5LongPress(){
-  Room_5_Time_Left_ms = 0;
-  Room_5_AlwaysOn = false;
+}
+
+void Room6Click(){
+  if(Room_6_On == true){
+    Room_6_On = false;
+  }else{
+    Room_6_On = true;
+  }
+}
+
+void Room6DoubleClick(){
+}
+
+void Room6LongPress(){
 }
 
 String processor(const String& var){
@@ -384,6 +414,7 @@ String processor(const String& var){
     buttons += "<h4>Output - Room 3</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"3\" " + outputState(3) + "><span class=\"slider\"></span></label>";
     buttons += "<h4>Output - Room 4</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"4\" " + outputState(4) + "><span class=\"slider\"></span></label>";
     buttons += "<h4>Output - Room 5</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"5\" " + outputState(5) + "><span class=\"slider\"></span></label>";
+    buttons += "<h4>Output - Room 6</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"6\" " + outputState(6) + "><span class=\"slider\"></span></label>";
     return buttons;
   }
   return String();
@@ -423,7 +454,15 @@ String outputState(int room){
       break;
 
     case 5 :
-      if(Room_5_AlwaysOn == true){
+      if(Room_5_On == true){
+        return "checked";
+      }else{
+        return "";
+      }
+      break;
+
+    case 6 :
+      if(Room_5_On == true){
         return "checked";
       }else{
         return "";
