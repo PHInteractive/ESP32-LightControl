@@ -8,8 +8,8 @@
 #include <ESPAsyncWebServer.h>
 
 //WiFi credentials
-const char* ssid = "ESP32_LightControl";
-const char* password = "supersecurePassword";
+const char* ssid = "";
+const char* password = "";
 IPAddress staticIP(192, 168, 1, 71);
 IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
