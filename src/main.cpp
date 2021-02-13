@@ -25,7 +25,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML><html>
 <head>
   <title>LightControl</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1", http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <link rel="icon" href="data:,">
   <style>
     html {font-family: Arial; display: inline-block; text-align: center;}
@@ -44,10 +44,14 @@ const char index_html[] PROGMEM = R"rawliteral(
   <h2>ESP32 Light Control</h2>
   %BUTTONPLACEHOLDER%
 <script>function toggleCheckbox(element) {
-  var xhr = new XMLHttpRequest();
-  if(element.checked){ xhr.open("GET", "/update?output="+element.id+"&state=1", true); }
-  else { xhr.open("GET", "/update?output="+element.id+"&state=0", true); }
-  xhr.send();
+  var a = confirm("Are you sure?");
+  if (a == false){
+  }else{
+    var xhr = new XMLHttpRequest();
+    if (element.checked){ xhr.open("GET", "/update?output="+element.id+"&state=1", true); }
+    else { xhr.open("GET", "/update?output="+element.id+"&state=0", true); }
+    xhr.send();
+  }
 }
 function AutoRefresh( t ) {
   setTimeout("location.reload(true);", t);
@@ -59,12 +63,12 @@ function AutoRefresh( t ) {
 
 
 //Setup Inputs
-OneButton Room1(32, true);
-OneButton Room2(23, true);
-OneButton Room3(15, true);
-OneButton Room4(1, true);
-OneButton Room5(3, true);
-OneButton Room6(21, true);
+OneButton Room1(32, true, true);
+OneButton Room2(14, true, true);
+OneButton Room3(15, true, true);
+OneButton Room4(1, true, true);
+OneButton Room5(3, true, true);
+OneButton Room6(21, true, true);
 
 //Setup Variables
 //timers
@@ -81,6 +85,11 @@ int Room_4_Time_Left_ms = 0;
 
 //functions
 void Relay1Controller(void * parameters);
+void Relay2Controller(void * parameters);
+void Relay3Controller(void * parameters);
+void Relay4Controller(void * parameters);
+void Relay5Controller(void * parameters);
+void Relay6Controller(void * parameters);
 void WiFi_connection_handler(void * parameters);
 void Room1Click();
 void Room1DoubleClick();
@@ -123,7 +132,17 @@ void setup() {
   digitalWrite(26, 1);
   digitalWrite(27, 1);
   //setup Threads
-  xTaskCreate(Relay1Controller, "Relay1Controller", 4048, NULL, 2, NULL);
+  xTaskCreate(Relay1Controller, "Relay1Controller", 1024, NULL, 2, NULL);
+  /*vTaskDelay(3 / portTICK_PERIOD_MS);
+  xTaskCreate(Relay2Controller, "Relay2Controller", 1024, NULL, 2, NULL);
+  vTaskDelay(3 / portTICK_PERIOD_MS);
+  xTaskCreate(Relay3Controller, "Relay3Controller", 1024, NULL, 2, NULL);
+  vTaskDelay(3 / portTICK_PERIOD_MS);
+  xTaskCreate(Relay4Controller, "Relay4Controller", 1024, NULL, 2, NULL);
+  vTaskDelay(3 / portTICK_PERIOD_MS);
+  xTaskCreate(Relay5Controller, "Relay5Controller", 1024, NULL, 2, NULL);
+  vTaskDelay(3 / portTICK_PERIOD_MS);
+  xTaskCreate(Relay6Controller, "Relay6Controller", 1024, NULL, 2, NULL);*/
   xTaskCreate(WiFi_connection_handler, "WiFi_connection_handler", 1024, NULL, 2, NULL);
 
   Room1.attachClick(Room1Click);
@@ -151,16 +170,16 @@ void setup() {
   Room4.attachLongPressStart(Room4LongPress);
 
   Room5.attachClick(Room5Click);
-  Room5.attachDoubleClick(Room5DoubleClick);
-  Room5.attachDuringLongPress(Room5LongPress);
-  Room5.attachLongPressStop(Room5LongPress);
-  Room5.attachLongPressStart(Room5LongPress);
+  Room5.attachDoubleClick(Room5Click);
+  Room5.attachDuringLongPress(Room5Click);
+  Room5.attachLongPressStop(Room5Click);
+  Room5.attachLongPressStart(Room5Click);
   
   Room6.attachClick(Room6Click);
-  Room6.attachDoubleClick(Room6DoubleClick);
-  Room6.attachDuringLongPress(Room6LongPress);
-  Room6.attachLongPressStop(Room6LongPress);
-  Room6.attachLongPressStart(Room6LongPress);
+  Room6.attachDoubleClick(Room6Click);
+  Room6.attachDuringLongPress(Room6Click);
+  Room6.attachLongPressStop(Room6Click);
+  Room6.attachLongPressStart(Room6Click);
   
   //initialize WiFi and WebServer
   if (WiFi.config(staticIP, gateway, subnet, dns, dns) == false) {
@@ -207,7 +226,8 @@ void setup() {
             Room_4_AlwaysOn = true;
           }else if(inputMessage2.toInt() == 0){
             Room_4_AlwaysOn = false;
-          }break;
+          }
+          break;
 
         case 5 :
           if(inputMessage2.toInt() == 1){
@@ -215,6 +235,8 @@ void setup() {
           }else if(inputMessage2.toInt() == 0){
             Room_5_On = false;
           }
+          break;
+
         case 6 :
           if(inputMessage2.toInt() == 1){
             Room_6_On = true;
@@ -230,7 +252,7 @@ void setup() {
 }
 
 void loop() {
-  vTaskDelay(50 / portTICK_PERIOD_MS);
+  vTaskDelay(10 / portTICK_PERIOD_MS);
   Room1.tick();
   Room2.tick();
   Room3.tick();
@@ -254,7 +276,6 @@ void Relay1Controller(void * parameters){
       digitalWrite(2, 0);
       Room_1_Time_Left_ms = Room_1_Time_Left_ms - time_wait_loop_ms;
     }
-
     if(Room_2_AlwaysOn == true){
       Room_2_Time_Left_ms = 60000;
       digitalWrite(4, 0);
@@ -267,7 +288,6 @@ void Relay1Controller(void * parameters){
       digitalWrite(4, 0);
       Room_2_Time_Left_ms = Room_2_Time_Left_ms - time_wait_loop_ms;
     }
-
     if(Room_3_AlwaysOn == true){
       Room_3_Time_Left_ms = 60000;
       digitalWrite(12, 0);
@@ -280,7 +300,6 @@ void Relay1Controller(void * parameters){
       digitalWrite(12, 0);
       Room_3_Time_Left_ms = Room_3_Time_Left_ms - time_wait_loop_ms;
     }
-
     if(Room_4_AlwaysOn == true){
       Room_4_Time_Left_ms = 60000;
       digitalWrite(13, 0);
@@ -293,92 +312,102 @@ void Relay1Controller(void * parameters){
       digitalWrite(13, 0);
       Room_4_Time_Left_ms = Room_4_Time_Left_ms - time_wait_loop_ms;
     }
-
     if(Room_5_On == false){
       digitalWrite(33, 1);
-      Room_6_On = false;
-      //digitalWrite(25, 1); //also turn off Room6 when Room5 is off
     }else if(Room_5_On == true){
       digitalWrite(33, 0);
     }
-
     if(Room_6_On == true and Room_5_On == true){
       digitalWrite(25, 0);
     }else{
+      Room_6_On = false;
       digitalWrite(25, 1);
     }
   }while(true);
-}
+  }
 
 void Room1Click(){
+  Serial.println("R1 click");
   if(Room_1_Time_Left_ms <= 420000){
     Room_1_Time_Left_ms = 420000;
   }
 }
 
 void Room1DoubleClick(){
+  Serial.println("R1 d-click");
   if(Room_1_Time_Left_ms <= 1200000){
     Room_1_Time_Left_ms = 1200000;
   }
 }
 
 void Room1LongPress(){
+  Serial.println("R1 l-click");
   Room_1_Time_Left_ms = 0;
   Room_1_AlwaysOn = false;
 }
 
 void Room2Click(){
+  Serial.println("R2 click");
   if(Room_2_Time_Left_ms <= 180000){
     Room_2_Time_Left_ms = 180000;
   }
 }
 
 void Room2DoubleClick(){
+  Serial.println("R2 d-click");
   if(Room_2_Time_Left_ms <= 900000){
     Room_2_Time_Left_ms = 900000;
   }
 }
 
 void Room2LongPress(){
+  Serial.println("R2 l-click");
   Room_2_Time_Left_ms = 0;
   Room_2_AlwaysOn = false;
 }
 
 void Room3Click(){
+  Serial.println("R3 click");
   if(Room_3_Time_Left_ms <= 180000){
     Room_3_Time_Left_ms = 180000;
   }
 }
 
 void Room3DoubleClick(){
+  Serial.println("R3 d-click");
   if(Room_3_Time_Left_ms <= 900000){
     Room_3_Time_Left_ms = 900000;
   }
 }
 
 void Room3LongPress(){
+  Serial.println("R3 l-click");
   Room_3_Time_Left_ms = 0;
   Room_3_AlwaysOn = false;
 }
 
 void Room4Click(){
+  Serial.println("R4 click");
   if(Room_4_Time_Left_ms <= 180000){
     Room_4_Time_Left_ms = 180000;
   }
 }
 
 void Room4DoubleClick(){
+  Serial.println("R4 d-click");
   if(Room_4_Time_Left_ms <= 900000){
     Room_4_Time_Left_ms = 900000;
   }
 }
 
 void Room4LongPress(){
+  //Serial.println("R4 l-click");
   Room_4_Time_Left_ms = 0;
   Room_4_AlwaysOn = false;
 }
 
 void Room5Click(){
+  Serial.println("R5 click");
   if(Room_5_On == true){
     Room_5_On = false;
   }else{
@@ -393,6 +422,7 @@ void Room5LongPress(){
 }
 
 void Room6Click(){
+  Serial.println("R6 click");
   if(Room_6_On == true){
     Room_6_On = false;
   }else{
@@ -409,10 +439,10 @@ void Room6LongPress(){
 String processor(const String& var){
   if(var == "BUTTONPLACEHOLDER"){
     String buttons = "";
-    buttons += "<h4>Output - Room 1</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"1\" " + outputState(1) + "><span class=\"slider\"></span></label>";
-    buttons += "<h4>Output - Room 2</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"2\" " + outputState(2) + "><span class=\"slider\"></span></label>";
-    buttons += "<h4>Output - Room 3</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"3\" " + outputState(3) + "><span class=\"slider\"></span></label>";
-    buttons += "<h4>Output - Room 4</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"4\" " + outputState(4) + "><span class=\"slider\"></span></label>";
+    buttons += "<h4>Output - Room 1 (Time Left: " + String(Room_1_Time_Left_ms/1000) +")</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"1\" " + outputState(1) + "><span class=\"slider\"></span></label>";
+    buttons += "<h4>Output - Room 2 (Time Left: " + String(Room_2_Time_Left_ms/1000) +")</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"2\" " + outputState(2) + "><span class=\"slider\"></span></label>";
+    buttons += "<h4>Output - Room 3 (Time Left: " + String(Room_3_Time_Left_ms/1000) +")</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"3\" " + outputState(3) + "><span class=\"slider\"></span></label>";
+    buttons += "<h4>Output - Room 4 (Time Left: " + String(Room_4_Time_Left_ms/1000) +")</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"4\" " + outputState(4) + "><span class=\"slider\"></span></label>";
     buttons += "<h4>Output - Room 5</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"5\" " + outputState(5) + "><span class=\"slider\"></span></label>";
     buttons += "<h4>Output - Room 6</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"6\" " + outputState(6) + "><span class=\"slider\"></span></label>";
     return buttons;
@@ -462,7 +492,7 @@ String outputState(int room){
       break;
 
     case 6 :
-      if(Room_5_On == true){
+      if(Room_6_On == true){
         return "checked";
       }else{
         return "";
