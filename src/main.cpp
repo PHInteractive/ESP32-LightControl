@@ -84,12 +84,7 @@ int Room_3_Time_Left_ms = 0;
 int Room_4_Time_Left_ms = 0;
 
 //functions
-void Relay1Controller(void * parameters);
-void Relay2Controller(void * parameters);
-void Relay3Controller(void * parameters);
-void Relay4Controller(void * parameters);
-void Relay5Controller(void * parameters);
-void Relay6Controller(void * parameters);
+void RelayController(void * parameters);
 void WiFi_connection_handler(void * parameters);
 void Room1Click();
 void Room1DoubleClick();
@@ -132,17 +127,7 @@ void setup() {
   digitalWrite(26, 1);
   digitalWrite(27, 1);
   //setup Threads
-  xTaskCreate(Relay1Controller, "Relay1Controller", 1024, NULL, 2, NULL);
-  /*vTaskDelay(3 / portTICK_PERIOD_MS);
-  xTaskCreate(Relay2Controller, "Relay2Controller", 1024, NULL, 2, NULL);
-  vTaskDelay(3 / portTICK_PERIOD_MS);
-  xTaskCreate(Relay3Controller, "Relay3Controller", 1024, NULL, 2, NULL);
-  vTaskDelay(3 / portTICK_PERIOD_MS);
-  xTaskCreate(Relay4Controller, "Relay4Controller", 1024, NULL, 2, NULL);
-  vTaskDelay(3 / portTICK_PERIOD_MS);
-  xTaskCreate(Relay5Controller, "Relay5Controller", 1024, NULL, 2, NULL);
-  vTaskDelay(3 / portTICK_PERIOD_MS);
-  xTaskCreate(Relay6Controller, "Relay6Controller", 1024, NULL, 2, NULL);*/
+  xTaskCreate(RelayController, "RelayController", 4096, NULL, 2, NULL);
   xTaskCreate(WiFi_connection_handler, "WiFi_connection_handler", 1024, NULL, 2, NULL);
 
   Room1.attachClick(Room1Click);
@@ -261,7 +246,7 @@ void loop() {
   Room6.tick();
 }
 
-void Relay1Controller(void * parameters){
+void RelayController(void * parameters){
   do{
     vTaskDelay(time_wait_loop_ms / portTICK_PERIOD_MS);
     if(Room_1_AlwaysOn == true){
