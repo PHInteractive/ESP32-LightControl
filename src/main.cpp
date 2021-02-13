@@ -312,87 +312,74 @@ void RelayController(void * parameters){
   }
 
 void Room1Click(){
-  Serial.println("R1 click");
   if(Room_1_Time_Left_ms <= 420000){
     Room_1_Time_Left_ms = 420000;
   }
 }
 
 void Room1DoubleClick(){
-  Serial.println("R1 d-click");
   if(Room_1_Time_Left_ms <= 1200000){
     Room_1_Time_Left_ms = 1200000;
   }
 }
 
 void Room1LongPress(){
-  Serial.println("R1 l-click");
   Room_1_Time_Left_ms = 0;
   Room_1_AlwaysOn = false;
 }
 
 void Room2Click(){
-  Serial.println("R2 click");
   if(Room_2_Time_Left_ms <= 180000){
     Room_2_Time_Left_ms = 180000;
   }
 }
 
 void Room2DoubleClick(){
-  Serial.println("R2 d-click");
   if(Room_2_Time_Left_ms <= 900000){
     Room_2_Time_Left_ms = 900000;
   }
 }
 
 void Room2LongPress(){
-  Serial.println("R2 l-click");
   Room_2_Time_Left_ms = 0;
   Room_2_AlwaysOn = false;
 }
 
 void Room3Click(){
-  Serial.println("R3 click");
   if(Room_3_Time_Left_ms <= 180000){
     Room_3_Time_Left_ms = 180000;
   }
 }
 
 void Room3DoubleClick(){
-  Serial.println("R3 d-click");
   if(Room_3_Time_Left_ms <= 900000){
     Room_3_Time_Left_ms = 900000;
   }
 }
 
 void Room3LongPress(){
-  Serial.println("R3 l-click");
   Room_3_Time_Left_ms = 0;
   Room_3_AlwaysOn = false;
 }
 
 void Room4Click(){
-  Serial.println("R4 click");
   if(Room_4_Time_Left_ms <= 180000){
     Room_4_Time_Left_ms = 180000;
   }
 }
 
 void Room4DoubleClick(){
-  Serial.println("R4 d-click");
   if(Room_4_Time_Left_ms <= 900000){
     Room_4_Time_Left_ms = 900000;
   }
 }
 
 void Room4LongPress(){
-  //Serial.println("R4 l-click");
   Room_4_Time_Left_ms = 0;
   Room_4_AlwaysOn = false;
 }
 
 void Room5Click(){
-  Serial.println("R5 click");
   if(Room_5_On == true){
     Room_5_On = false;
   }else{
@@ -407,7 +394,6 @@ void Room5LongPress(){
 }
 
 void Room6Click(){
-  Serial.println("R6 click");
   if(Room_6_On == true){
     Room_6_On = false;
   }else{
