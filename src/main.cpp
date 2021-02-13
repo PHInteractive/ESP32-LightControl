@@ -25,7 +25,7 @@ const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML><html>
 <head>
   <title>LightControl</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1", http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta name="viewport" content="width=device-width, initial-scale=1", charset="utf-8" http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <link rel="icon" href="data:,">
   <style>
     html {font-family: Arial; display: inline-block; text-align: center;}
