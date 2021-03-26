@@ -6,6 +6,7 @@
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
+#include <NTPClient.h>
 
 //WiFi credentials
 const char* ssid = "";
@@ -14,6 +15,15 @@ IPAddress staticIP(192, 168, 1, 71);
 IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 IPAddress dns(192, 168, 1, 1);
+
+bool NTPstarted = false;
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, "europe.pool.ntp.org", 3600, 60000);
+int restartHour = 23;
+int restartMinute = 59;
+String startupTime = "0";
+int rebootCounter = 0;
+
 
 //WebServer variables
 AsyncWebServer Server(80);
@@ -24,7 +34,7 @@ String outputState(int room);
 const char index_html[] PROGMEM = R"rawliteral(
 <!DOCTYPE HTML><html>
 <head>
-  <title>LightControl</title>
+  <title>Lichtsteuerung Keller</title>
   <meta name="viewport" content="width=device-width, initial-scale=1", charset="utf-8" http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <link rel="icon" href="data:,">
   <style>
@@ -41,7 +51,7 @@ const char index_html[] PROGMEM = R"rawliteral(
   </style>
 </head>
 <body onload = "JavaScript:AutoRefresh(5000);">
-  <h2>ESP32 Light Control</h2>
+  <h2>Lichtsteuerung Keller</h2>
   %BUTTONPLACEHOLDER%
 <script>function toggleCheckbox(element) {
   var a = confirm("Are you sure?");
@@ -68,7 +78,7 @@ OneButton Room2(14, true, true);
 OneButton Room3(15, true, true);
 OneButton Room4(1, true, true);
 OneButton Room5(3, true, true);
-OneButton Room6(21, true, true);
+OneButton Room6(5, true, true);
 
 //Setup Variables
 //timers
@@ -99,16 +109,20 @@ void Room4Click();
 void Room4DoubleClick();
 void Room4LongPress();
 void Room5Click();
-void Room5DoubleClick();
-void Room5LongPress();
 void Room6Click();
-void Room6DoubleClick();
-void Room6LongPress();
+
 //global
 int time_wait_loop_ms = 500;
 
 void setup() {
   //Setup Outputs
+  //Serial.begin(115200);
+  pinMode(32, INPUT_PULLUP);
+  pinMode(14, INPUT_PULLUP);
+  pinMode(15, INPUT_PULLUP);
+  pinMode(1, INPUT_PULLUP);
+  pinMode(3, INPUT_PULLUP);
+  pinMode(5, INPUT_PULLUP);
   pinMode(2, OUTPUT);
   pinMode(4, OUTPUT);
   pinMode(12, OUTPUT);
@@ -128,7 +142,7 @@ void setup() {
   digitalWrite(27, 1);
   //setup Threads
   xTaskCreate(RelayController, "RelayController", 4096, NULL, 2, NULL);
-  xTaskCreate(WiFi_connection_handler, "WiFi_connection_handler", 1024, NULL, 2, NULL);
+  xTaskCreate(WiFi_connection_handler, "WiFi_connection_handler", 1024, NULL, 3, NULL);
 
   Room1.attachClick(Room1Click);
   Room1.attachDoubleClick(Room1DoubleClick);
@@ -155,16 +169,8 @@ void setup() {
   Room4.attachLongPressStart(Room4LongPress);
 
   Room5.attachClick(Room5Click);
-  Room5.attachDoubleClick(Room5Click);
-  Room5.attachDuringLongPress(Room5Click);
-  Room5.attachLongPressStop(Room5Click);
-  Room5.attachLongPressStart(Room5Click);
   
   Room6.attachClick(Room6Click);
-  Room6.attachDoubleClick(Room6Click);
-  Room6.attachDuringLongPress(Room6Click);
-  Room6.attachLongPressStop(Room6Click);
-  Room6.attachLongPressStart(Room6Click);
   
   //initialize WiFi and WebServer
   if (WiFi.config(staticIP, gateway, subnet, dns, dns) == false) {
@@ -387,12 +393,6 @@ void Room5Click(){
   }
 }
 
-void Room5DoubleClick(){
-}
-
-void Room5LongPress(){
-}
-
 void Room6Click(){
   if(Room_6_On == true){
     Room_6_On = false;
@@ -401,21 +401,16 @@ void Room6Click(){
   }
 }
 
-void Room6DoubleClick(){
-}
-
-void Room6LongPress(){
-}
-
 String processor(const String& var){
   if(var == "BUTTONPLACEHOLDER"){
     String buttons = "";
-    buttons += "<h4>Output - Room 1 (Time Left: " + String(Room_1_Time_Left_ms/1000) +")</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"1\" " + outputState(1) + "><span class=\"slider\"></span></label>";
-    buttons += "<h4>Output - Room 2 (Time Left: " + String(Room_2_Time_Left_ms/1000) +")</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"2\" " + outputState(2) + "><span class=\"slider\"></span></label>";
-    buttons += "<h4>Output - Room 3 (Time Left: " + String(Room_3_Time_Left_ms/1000) +")</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"3\" " + outputState(3) + "><span class=\"slider\"></span></label>";
-    buttons += "<h4>Output - Room 4 (Time Left: " + String(Room_4_Time_Left_ms/1000) +")</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"4\" " + outputState(4) + "><span class=\"slider\"></span></label>";
-    buttons += "<h4>Output - Room 5</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"5\" " + outputState(5) + "><span class=\"slider\"></span></label>";
-    buttons += "<h4>Output - Room 6</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"6\" " + outputState(6) + "><span class=\"slider\"></span></label>";
+    buttons += "<h4>Großer Keller (Sekunden verbleiben: " + String(Room_1_Time_Left_ms/1000) +")</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"1\" " + outputState(1) + "><span class=\"slider\"></span></label>";
+    buttons += "<h4>Heizraum (Sekunden verbleiben: " + String(Room_2_Time_Left_ms/1000) +")</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"2\" " + outputState(2) + "><span class=\"slider\"></span></label>";
+    buttons += "<h4>Getränkeraum (Sekunden verbleiben: " + String(Room_3_Time_Left_ms/1000) +")</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"3\" " + outputState(3) + "><span class=\"slider\"></span></label>";
+    buttons += "<h4>Außenbereich (Sekunden verbleiben: " + String(Room_4_Time_Left_ms/1000) +")</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"4\" " + outputState(4) + "><span class=\"slider\"></span></label>";
+    buttons += "<h4>Werkstatt</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"5\" " + outputState(5) + "><span class=\"slider\"></span></label>";
+    buttons += "<h4>Trainingsraum</h4><label class=\"switch\"><input type=\"checkbox\" onchange=\"toggleCheckbox(this)\" id=\"6\" " + outputState(6) + "><span class=\"slider\"></span></label>";
+    buttons += "<h4>Startup Time: " + startupTime + "</h4>";
     return buttons;
   }
   return String();
@@ -480,6 +475,24 @@ void WiFi_connection_handler(void * parameters){
       vTaskDelay(1000 / portTICK_PERIOD_MS);
       WiFi.begin();
       vTaskDelay(5000 / portTICK_PERIOD_MS);
+      rebootCounter++;
+      if(rebootCounter >= 20 and Room_1_Time_Left_ms == 0 and Room_2_Time_Left_ms == 0 and Room_3_Time_Left_ms == 0 and Room_4_Time_Left_ms == 0 and Room_5_On == false and Room_6_On == false){
+        esp_restart();
+      }
+    }else{
+      if(NTPstarted == false){
+        timeClient.begin();
+        NTPstarted = true;
+        vTaskDelay(1000);
+        timeClient.update();
+        startupTime = timeClient.getFormattedTime();
+      }
+      rebootCounter = 0;
+      //Serial.println(timeClient.getFormattedTime());  
+      //timeClient.update();
+      if(timeClient.getHours() == restartHour and timeClient.getMinutes() == restartMinute and Room_1_Time_Left_ms == 0 and Room_2_Time_Left_ms == 0 and Room_3_Time_Left_ms == 0 and Room_4_Time_Left_ms == 0 and Room_5_On == false and Room_6_On == false){
+        esp_restart();
+      }
     }
   }while(true);
 }
